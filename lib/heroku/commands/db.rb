@@ -14,15 +14,19 @@ module Heroku::Command
 		end
 
 		def push
-			database_url = args.shift.strip rescue ''
-			if database_url == ''
-				database_url = parse_database_yml
-				display "Auto-detected local database: #{database_url}" if database_url != ''
-			end
-			raise(CommandFailed, "Invalid database url") if database_url == ''
+			display("Warning: All data in the the remote database will be overwritten and will not be recoverable.")
+			display("Are you sure you wish to push to the remote database? (y/n)? ", false)
+			if ask.downcase == 'y'
+  			database_url = args.shift.strip rescue ''
+  			if database_url == ''
+  				database_url = parse_database_yml
+  				display "Auto-detected local database: #{database_url}" if database_url != ''
+  			end
+  			raise(CommandFailed, "Invalid database url") if database_url == ''
 
-			taps_client(database_url) do |client|
-				client.cmd_send
+  			taps_client(database_url) do |client|
+  				client.cmd_send
+  			end
 			end
 		end
 

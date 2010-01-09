@@ -15,9 +15,17 @@ module Heroku::Command
 		end
 
 		it "push database" do
+			@db.stub!(:ask).and_return('y')
 			@db.stub!(:args).and_return(['postgres://postgres@localhost/db'])
 			@db.should_receive(:taps_client).with('postgres://postgres@localhost/db').and_yield(@taps_client)
 			@taps_client.should_receive(:cmd_send)
+			@db.push
+		end
+		
+		it "doesn't push database if the user doesn't confirm" do
+			@db.stub!(:ask).and_return('no')
+			@db.stub!(:args).and_return(['postgres://postgres@localhost/db'])
+			@db.should_not_receive(:taps_client)
 			@db.push
 		end
 
